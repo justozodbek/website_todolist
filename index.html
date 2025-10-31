@@ -3,18 +3,512 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
     <title>Todo List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+      :root {
+        --primary: #7c3aed;
+        --primary-light: #8b5cf6;
+        --primary-dark: #6d28d9;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --success: #10b981;
+        --danger: #ef4444;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --radius: 8px;
+        --transition: all 0.2s ease-in-out;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        color: var(--gray-800);
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        transition: var(--transition);
+      }
+
+      .container {
+        max-width: 500px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .app-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+        animation: fadeInDown 0.8s ease-out;
+      }
+
+      .app-title {
+        color: var(--primary);
+        font-size: 4rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .app-subtitle {
+        color: var(--gray-500);
+        font-size: 1.1rem;
+        font-weight: 400;
+      }
+
+      .todo-card {
+        background-color: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        animation: slideUp 0.5s ease-out;
+      }
+
+      .todo-form {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray-200);
+      }
+
+      .input-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .input {
+        flex: 1;
+        border: none;
+        background-color: var(--gray-50);
+        color: var(--gray-800);
+        font-size: 1rem;
+        padding: 0.875rem 1rem;
+        border-radius: var(--radius);
+        transition: var(--transition);
+        font-family: 'Inter', sans-serif;
+      }
+
+      .input::placeholder {
+        color: var(--gray-400);
+      }
+
+      .input:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px var(--primary-light);
+        background-color: white;
+      }
+
+      .btn-add {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 1.2rem;
+      }
+
+      .btn-add:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      .btn-add:active {
+        transform: translateY(0);
+      }
+
+      .todos-container {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .todos {
+        background-color: white;
+        padding: 0;
+        margin: 0;
+        list-style-type: none;
+      }
+
+      .todo-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        transition: var(--transition);
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .todo-item:last-child {
+        border-bottom: none;
+      }
+
+      .todo-item:hover {
+        background-color: var(--gray-50);
+      }
+
+      .todo-checkbox {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--gray-300);
+        margin-right: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        flex-shrink: 0;
+      }
+
+      .todo-checkbox.checked {
+        background-color: var(--primary);
+        border-color: var(--primary);
+      }
+
+      .todo-checkbox.checked::after {
+        content: '✓';
+        color: white;
+        font-size: 0.75rem;
+        font-weight: bold;
+      }
+
+      .todo-text {
+        flex: 1;
+        font-size: 1rem;
+        color: var(--gray-800);
+        transition: var(--transition);
+      }
+
+      .todo-item.completed .todo-text {
+        color: var(--gray-400);
+        text-decoration: line-through;
+      }
+
+      .todo-actions {
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: var(--transition);
+      }
+
+      .todo-item:hover .todo-actions {
+        opacity: 1;
+      }
+
+      .btn-action {
+        background: none;
+        border: none;
+        color: var(--gray-500);
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+      }
+
+      .btn-action:hover {
+        background-color: var(--gray-200);
+        color: var(--gray-700);
+      }
+
+      .btn-delete:hover {
+        background-color: var(--danger);
+        color: white;
+      }
+
+      .app-footer {
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        margin-top: 1.5rem;
+        animation: fadeIn 0.8s ease-out 0.3s both;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        background-color: var(--gray-50);
+        border-top: 1px solid var(--gray-200);
+        color: var(--gray-600);
+        font-size: 0.875rem;
+      }
+
+      .empty-state {
+        padding: 3rem 2rem;
+        text-align: center;
+        color: var(--gray-400);
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideOut {
+        to {
+          opacity: 0;
+          transform: translateX(100px);
+        }
+      }
+
+      .todo-item.removing {
+        animation: slideOut 0.3s ease-out forwards;
+      }
+
+      /* Scrollbar styling */
+      .todos-container::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .todos-container::-webkit-scrollbar-track {
+        background: var(--gray-100);
+      }
+
+      .todos-container::-webkit-scrollbar-thumb {
+        background: var(--gray-300);
+        border-radius: 3px;
+      }
+
+      .todos-container::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-400);
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 480px) {
+        .app-title {
+          font-size: 3rem;
+        }
+
+        .todo-form {
+          padding: 1rem;
+        }
+
+        .todo-item {
+          padding: 0.875rem 1rem;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h1>todos</h1>
-    <form id="form">
-      <input type="text" class="input" id="input" placeholder="Enter your todo" autocomplete="off">
+    <div class="container">
+      <header class="app-header">
+        <h1 class="app-title">todos</h1>
+        <p class="app-subtitle">Minimal task management with elegance</p>
+      </header>
 
-      <ul class="todos" id="todos"></ul>
-    </form>
-    <small>Left click to toggle completed. <br> Right click to delete todo</small>
+      <main class="todo-card">
+        <form id="form" class="todo-form">
+          <div class="input-group">
+            <input type="text" class="input" id="input" placeholder="What needs to be done?" autocomplete="off">
+            <button type="submit" class="btn-add">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </form>
 
-    <script src="script.js"></script>
+        <div class="todos-container">
+          <ul class="todos" id="todos">
+            <!-- Todos will be added here dynamically -->
+          </ul>
+        </div>
+
+        <div class="stats">
+          <span id="total-tasks">0 tasks</span>
+          <span id="completed-tasks">0 completed</span>
+        </div>
+      </main>
+
+      <footer class="app-footer">
+        <small>
+          <i class="fas fa-lightbulb"></i> Click to toggle completed •
+          <i class="fas fa-trash"></i> Click delete button to remove
+        </small>
+      </footer>
+    </div>
+
+    <script>
+      const form = document.getElementById('form')
+      const input = document.getElementById('input')
+      const todosUL = document.getElementById('todos')
+      const totalTasksEl = document.getElementById('total-tasks')
+      const completedTasksEl = document.getElementById('completed-tasks')
+
+      // Load todos from localStorage
+      const todos = JSON.parse(localStorage.getItem('todos')) || []
+
+      // Initialize the app
+      if(todos.length > 0) {
+        todos.forEach(todo => addTodo(todo))
+      } else {
+        showEmptyState()
+      }
+
+      updateStats()
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        addTodo()
+      })
+
+      function addTodo(todo) {
+        let todoText = input.value.trim()
+
+        if(todo) {
+          todoText = todo.text
+        }
+
+        if(todoText) {
+          // Remove empty state if it exists
+          const emptyState = document.querySelector('.empty-state')
+          if (emptyState) emptyState.remove()
+
+          const todoEl = document.createElement('li')
+          todoEl.className = 'todo-item'
+
+          if(todo && todo.completed) {
+            todoEl.classList.add('completed')
+          }
+
+          todoEl.innerHTML = `
+            <div class="todo-checkbox ${todo && todo.completed ? 'checked' : ''}"></div>
+            <span class="todo-text">${todoText}</span>
+            <div class="todo-actions">
+              <button class="btn-action btn-delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `
+
+          // Toggle completed state
+          const checkbox = todoEl.querySelector('.todo-checkbox')
+          checkbox.addEventListener('click', () => {
+            todoEl.classList.toggle('completed')
+            checkbox.classList.toggle('checked')
+            updateLS()
+            updateStats()
+          })
+
+          // Delete todo
+          const deleteBtn = todoEl.querySelector('.btn-delete')
+          deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            todoEl.classList.add('removing')
+            setTimeout(() => {
+              todoEl.remove()
+              updateLS()
+              updateStats()
+
+              if (todosUL.children.length === 0) {
+                showEmptyState()
+              }
+            }, 300)
+          })
+
+          todosUL.appendChild(todoEl)
+          input.value = ''
+          updateLS()
+          updateStats()
+        }
+      }
+
+      function updateLS() {
+        const todosEl = document.querySelectorAll('.todo-item')
+        const todos = []
+
+        todosEl.forEach(todoEl => {
+          todos.push({
+            text: todoEl.querySelector('.todo-text').innerText,
+            completed: todoEl.classList.contains('completed')
+          })
+        })
+
+        localStorage.setItem('todos', JSON.stringify(todos))
+      }
+
+      function updateStats() {
+        const totalTasks = document.querySelectorAll('.todo-item').length
+        const completedTasks = document.querySelectorAll('.todo-item.completed').length
+
+        totalTasksEl.textContent = `${totalTasks} ${totalTasks === 1 ? 'task' : 'tasks'}`
+        completedTasksEl.textContent = `${completedTasks} completed`
+      }
+
+      function showEmptyState() {
+        const emptyState = document.createElement('div')
+        emptyState.className = 'empty-state'
+        emptyState.innerHTML = `
+          <i class="far fa-check-circle"></i>
+          <p>No tasks yet. Add a task to get started!</p>
+        `
+        todosUL.appendChild(emptyState)
+      }
+    </script>
   </body>
 </html>
